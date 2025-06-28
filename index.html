@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Contact Book</title>
+  </head>
+  <body onload="fetchContacts()">
+
+    <div id="table">Contacts loading...</div>
+    <button id="refresh" type="button">Refresh</button>
+    <button id="addContact" type="button">Add Contact</button>
+ 
+    <script src="config.js"></script>
+    <script>
+
+      document.getElementById("refresh").addEventListener('click', fetchContacts);
+      document.getElementById("addContact").addEventListener('click', addContact);
+      
+      function fetchContacts(){
+        fetch(`${rootPath}controller/get-contacts/?apiKey=${apiKey}`)
+
+          .then(res => res.json())
+          .then(data => displayOutput(data))
+          .catch(err => {
+            console.error("Error loading contacts:", err);
+            document.getElementById("table").innerHTML = "Could not load contacts.";
+          });
+      }
+
+      function displayOutput(data){
+        let output = "<table>";
+        
+        for(a in data){
+          output += `
+            <tr onclick="editContact(${data[a].id})">
+              <td><img src="${rootPath}controller/uploads/${data[a].avatar}" width="40"/></td>
+              <td><h5>${data[a].firstname}</h5></td>
+              <td><h5>${data[a].lastname}</h5></td>
+            </tr>
+          `
+            
+        }
+        output += "</table>";
+        document.getElementById("table").innerHTML = output;
+
+        if (data.length === 0) {
+          document.getElementById("table").innerHTML = "No contacts found.";
+          return;
+        }
+
+      }
+
+      function addContact(){
+        window.open("add-contact.html", "_self");
+      }
+
+      function editContact(id){
+        window.open("edit-contact.html?id=" + id, "_self");
+      }
+
+    </script>
+  </body>
+</html>
